@@ -3,7 +3,10 @@ from enum import Enum
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from app.api import auth, snippets
+from app.api.auth import auth
+from app.api.search import search
+from app.api.snippets import snippets
+from app.api.test import test
 from app.core.database import connect
 from dotenv import load_dotenv
 
@@ -24,6 +27,8 @@ app.add_middleware(
 )
 app.include_router(auth.router)
 app.include_router(snippets.router)
+app.include_router(search.router)
+app.include_router(test.router)
 @app.on_event("startup")
 async def startup():
     await connect()

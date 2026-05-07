@@ -6,11 +6,11 @@ from pydantic import BaseModel, Field
 class SnippetState(str, Enum):
     PENDING = "pending"
     ACTIVE = "active"
-    INACTIVE = "inactive"
+    DONE = "done"
 class SnippetCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     code: str = Field(..., min_length=1)
-    programming_language: str = Field(..., min_length=1, max_length=50)
+    language: str = Field(..., min_length=1, max_length=50)
     tags: List[str] = []
     is_public: bool = True
 

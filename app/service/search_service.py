@@ -12,10 +12,6 @@ async def keyword_search(
     language: Optional[str] = None,
     limit: int = 20,
 ) -> List[SnippetOut]:
-    """
-    Phase 1: MongoDB $text search on title + tags (index created at startup).
-    Phase 2: replace / augment with semantic search via embeddings.
-    """
     db = get_db()
 
     match: dict = {

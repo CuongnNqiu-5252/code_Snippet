@@ -20,8 +20,6 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 async def register(request: UserRegister):
     if await user_collection().find_one({"email": request.email}):
         raise HTTPException(status_code=409, detail="Email already registered")
-    new_user = request.model_dump(by_alias=True, exclude={"password"})
-    print(new_user)
     await user_collection().insert_one({
         "email": request.email,
         "password": hash_password(request.password),

@@ -1,12 +1,14 @@
+import asyncio
 from datetime import datetime, timezone
 from typing import List, Optional
 
 from bson import ObjectId
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, BackgroundTasks
 
 from app.core.database import get_db
 from app.core.security import get_current_user
-from app.models.snippet import SnippetCreate, SnippetOut, SnippetUpdate
+from app.models.snippet import SnippetCreate, SnippetOut, SnippetUpdate, SnippetState
+from app.worker.ai_tasks import create_embedding, generate_summary
 
 
 def _serialize(doc: dict) -> SnippetOut:
@@ -21,13 +23,21 @@ def _serialize(doc: dict) -> SnippetOut:
         created_at=doc["createdAt"],
         updated_at=doc["updatedAt"],
         summary=doc.get("summary"),
-        status=doc.get("status", "pending"),
+        status=doc.get("status", SnippetState.PENDING),
     )
 
 
-async def create_snippet(data: SnippetCreate, user_id: str) -> SnippetOut:
+async def create_snippet(
+    data: SnippetCreate,
+    user_id: str,
+    background_tasks: BackgroundTasks
+) -> SnippetOut:
+
     db = get_db()
     now = datetime.now(timezone.utc)
+
+    # embedding sync (or move to background later)
+
     doc = {
         "title": data.title,
         "code": data.code,
@@ -39,13 +49,36 @@ async def create_snippet(data: SnippetCreate, user_id: str) -> SnippetOut:
         "updatedAt": now,
         "summary": None,
         "embedding": [],
-        "status": "pending",  # AI will fill summary in Phase 2
+        "status": "pending",
     }
+
     result = await db.snippets.insert_one(doc)
     doc["_id"] = result.inserted_id
+
+    # background task (future AI processing)
+    background_tasks.add_task(worker, str(result.inserted_id))
+
     return _serialize(doc)
+async def worker(snippet_id: str):
+    db = get_db()
 
+    doc = await db.snippets.find_one({"_id": ObjectId(snippet_id)})
+    if not doc:
+        return
+    embedding_task = create_embedding(doc["code"])
+    summary_task = generate_summary(doc["code"])
 
+    embedding_res, summary = await asyncio.gather(
+        embedding_task,
+        summary_task
+    )
+
+    embedding_vector = embedding_res["data"][0]["embedding"]
+
+    await db.snippets.update_one(
+        {"_id": ObjectId(snippet_id)},
+        {"$set": {"summary": summary, "embedding": embedding_vector ,"status": "done"}}
+    )
 async def list_snippets(
     user_id: str,
     language: Optional[str] = None,
