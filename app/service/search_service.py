@@ -6,7 +6,7 @@ from app.models.snippet import SnippetOut
 from app.service.snippet_service import _serialize
 
 
-async def keyword_search(
+def keyword_search(
     query: str,
     user_id: str,
     language: Optional[str] = None,
@@ -29,4 +29,4 @@ async def keyword_search(
         .sort([("score", {"$meta": "textScore"})])
         .limit(limit)
     )
-    return [_serialize(doc) async for doc in cursor]
+    return [_serialize(doc) for doc in cursor]

@@ -1,33 +1,49 @@
 import os
 
-from pymongo import AsyncMongoClient
+from pymongo import MongoClient
+from pymongo.server_api import ServerApi
 
-client : AsyncMongoClient = None
+client = None
+db = None
 
-def get_db():
-    return client[os.getenv("DB_NAME")]
-async def create_indexes():
-    db = get_db()
-    await db.snippets.create_index("language")
-async def connect():
+
+def connect():
     global client
-    client = AsyncMongoClient(os.environ["MONGO_URI"])
-    db = get_db()
-    await db.users.create_index("email", unique=True)
-    await db.snippets.create_index("createdBy")
-    try:
-        await db.snippets.drop_index("title_text_tags_text")
-    except Exception:
-        pass
-    await db.snippets.create_index(
-        [("title", "text"), ("tags", "text")],
-        language_override="search_language",
+    global db
+
+    client = MongoClient(
+        os.environ["uri"],
+        server_api=ServerApi("1")
     )
 
-def user_collection():
-    return get_db().get_collection("users")
-async def snippet_collection():
-    return get_db().get_collection("snippets")
+    db = client["my_code_snippet"]
 
-async def bookmark_collection():
-    return get_db().get_collection("bookmarks")
+    db.users.create_index("email", unique=True)
+
+    db.snippets.create_index("createdBy")
+
+    try:
+        db.snippets.drop_index("title_text_tags_text")
+    except Exception:
+        pass
+
+    db.snippets.create_index([
+        ("title", "text"),
+        ("tags", "text")
+    ])
+
+
+def get_db():
+    return db
+
+
+def user_collection():
+    return db["users"]
+
+
+def snippet_collection():
+    return db["snippets"]
+
+
+def bookmark_collection():
+    return db["bookmarks"]

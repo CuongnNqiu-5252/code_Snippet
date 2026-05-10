@@ -18,9 +18,9 @@ router = APIRouter(prefix="/auth", tags=["auth"])
     response_model_by_alias=True,
     responses={})
 async def register(request: UserRegister):
-    if await user_collection().find_one({"email": request.email}):
+    if  user_collection().find_one({"email": request.email}):
         raise HTTPException(status_code=409, detail="Email already registered")
-    await user_collection().insert_one({
+    user_collection().insert_one({
         "email": request.email,
         "password": hash_password(request.password),
         "createdAt": datetime.now(timezone.utc),
@@ -30,7 +30,7 @@ async def register(request: UserRegister):
 
 @router.post("/login", response_model=TokenResponse)
 async def login(data: UserLogin):
-    user = await user_collection().find_one({"email": data.email})
+    user = user_collection().find_one({"email": data.email})
     if not user or not verify_password(data.password, user["password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 

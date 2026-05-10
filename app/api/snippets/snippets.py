@@ -14,14 +14,14 @@ async def create(data: SnippetCreate, background_tasks: BackgroundTasks, user=De
 
 
 @router.get("", response_model=List[SnippetOut])
-async def list_all(
+def list_all(
     language: Optional[str] = Query(None),
     tag: Optional[str] = Query(None),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     user=Depends(get_current_user),
 ):
-    return await snippet_service.list_snippets(
+    return snippet_service.list_snippets(
         user, language=language, tag=tag, skip=skip, limit=limit
     )
 

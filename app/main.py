@@ -30,8 +30,8 @@ app.include_router(snippets.router)
 app.include_router(search.router)
 app.include_router(test.router)
 @app.on_event("startup")
-async def startup():
-    await connect()
+def startup():
+    connect()
 @app.get("app/models/{model_name}")
 async def get_model(model_name: ModelName):
     if model_name is ModelName.alexnet:
