@@ -2,6 +2,7 @@ from enum import Enum
 
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
+from starlette.testclient import TestClient
 
 from app.api.auth import auth
 from app.api.search import search
@@ -48,3 +49,4 @@ async def root():
 @app.get("/items/{item_id}")
 async def read_item(item_id: int):
     return {"item_id": item_id}
+
