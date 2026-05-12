@@ -79,28 +79,38 @@ async def worker(snippet_id: str):
         {"_id": ObjectId(snippet_id)},
         {"$set": {"summary": summary, "embedding": embedding_vector ,"status": "done"}}
     )
-async def list_snippets(
+def list_snippets(
     user_id: str,
     language: Optional[str] = None,
     tag: Optional[str] = None,
     skip: int = 0,
     limit: int = 20,
 ) -> List[SnippetOut]:
+
     db = get_db()
-    query: dict = {
+
+    query = {
         "$or": [
             {"createdBy": ObjectId(user_id)},
             {"isPublic": True},
         ]
     }
+
     if language:
         query["language"] = language
+
     if tag:
         query["tags"] = tag
 
-    cursor = db.snippets.find(query).sort("createdAt", -1).skip(skip).limit(limit)
-    return [_serialize(doc) async for doc in cursor]
+    cursor = (
+        db.snippets
+        .find(query)
+        .sort("createdAt", -1)
+        .skip(skip)
+        .limit(limit)
+    )
 
+    return [_serialize(doc) for doc in cursor]
 
 async def get_snippet(snippet_id: str, user_id: str) -> SnippetOut:
     db = get_db()

@@ -1,7 +1,14 @@
+import asyncio
+import json
 from enum import Enum
+from time import sleep
+from typing import AsyncIterable, Iterable
 
 from fastapi import FastAPI
+from fastapi.sse import EventSourceResponse, ServerSentEvent
+from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import StreamingResponse
 from starlette.testclient import TestClient
 
 from app.api.auth import auth
@@ -46,7 +53,58 @@ async def get_model(model_name: ModelName):
 @app.get("/")
 async def root():
     return {"message": "Hello"}
-@app.get("/items/{item_id}")
-async def read_item(item_id: int):
-    return {"item_id": item_id}
+# @app.get("/items/{item_id}")
+# async def read_item(item_id: int):
+#     return {"item_id": item_id}
 
+class Item(BaseModel):
+    name: str
+    description: str | None
+
+
+items = [
+    Item(name="Plumbus", description="A multi-purpose household device."),
+    Item(name="Portal Gun", description="A portal opening device."),
+    Item(name="Meeseeks Box", description="A box that summons a Meeseeks."),
+
+
+]
+
+@app.get("/items/stream", response_class=EventSourceResponse)
+async def sse_items() -> AsyncIterable[Item]:
+    print("hi")
+    for item in items:
+        yield item
+        await asyncio.sleep(10)
+@app.get("/items/stream-no-async", response_class=EventSourceResponse)
+def sse_items_no_async() -> Iterable[Item]:
+    for item in items:
+        yield item
+
+
+@app.get("/items/stream-no-annotation", response_class=EventSourceResponse)
+async def sse_items_no_annotation():
+    for item in items:
+        yield item
+
+
+@app.get("/items/stream-no-async-no-annotation", response_class=EventSourceResponse)
+def sse_items_no_async_no_annotation():
+    for item in items:
+        yield item
+
+message = """
+Rick: (stumbles in drunkenly, and turns on the lights) Morty! You gotta come on. You got--... you gotta come with me.
+Morty: (rubs his eyes) What, Rick? What's going on?
+Rick: I got a surprise for you, Morty.
+Morty: It's the middle of the night. What are you talking about?
+Rick: (spills alcohol on Morty's bed) Come on, I got a surprise for you. (drags Morty by the ankle) Come on, hurry up. (pulls Morty out of his bed and into the hall)
+Morty: Ow! Ow! You're tugging me too hard!
+Rick: We gotta go, gotta get outta here, come on. Got a surprise for you Morty.
+"""
+
+
+@app.get("/story/stream", response_class=StreamingResponse)
+async def stream_story() -> AsyncIterable[str]:
+    for line in message.splitlines():
+        yield line

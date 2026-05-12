@@ -4,8 +4,9 @@ from fastapi import APIRouter, BackgroundTasks, Depends, Query, status
 from app.core.security import get_current_user
 from app.models.snippet import SnippetCreate, SnippetOut, SnippetUpdate
 from app.service import snippet_service
+from typing import Annotated
 
-router = APIRouter(prefix="/snippets", tags=["snippets"])
+router = APIRouter(prefix="/snippets", tags=["snippets"],dependencies=[Depends(get_current_user)])
 
 
 @router.post("", response_model=SnippetOut, status_code=status.HTTP_201_CREATED)
@@ -15,12 +16,14 @@ async def create(data: SnippetCreate, background_tasks: BackgroundTasks, user=De
 
 @router.get("", response_model=List[SnippetOut])
 def list_all(
+    user: Annotated[str, Depends(get_current_user)],
     language: Optional[str] = Query(None),
     tag: Optional[str] = Query(None),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
-    user=Depends(get_current_user),
+
 ):
+    print(user)
     return snippet_service.list_snippets(
         user, language=language, tag=tag, skip=skip, limit=limit
     )
