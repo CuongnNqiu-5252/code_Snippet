@@ -1,0 +1,86 @@
+.form-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 300;
+}
+.form-modal {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: 640px; max-width: 95vw; max-height: 90vh;
+  background: rgba(12,12,24,0.98); backdrop-filter: blur(24px);
+  border: 1px solid var(--border-glass); border-radius: var(--radius-xl);
+  z-index: 301; display: flex; flex-direction: column; overflow: hidden;
+}
+.form-modal__header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--space-6); border-bottom: 1px solid var(--border-glass);
+}
+.form-modal__title { font-family: var(--font-display); font-size: 1.25rem; }
+.form-modal__close {
+  padding: var(--space-2); color: var(--text-secondary); cursor: pointer;
+  border-radius: var(--radius-sm); transition: all var(--transition-fast);
+}
+.form-modal__close:hover { background: var(--bg-glass); color: var(--text-primary); }
+.form-modal__body {
+  padding: var(--space-6); overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-5);
+}
+.form-modal__error {
+  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3);
+  color: #EF4444; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); font-size: 0.875rem;
+}
+.form-modal__title-input {
+  width: 100%; padding: var(--space-3) 0; font-size: 1.25rem; font-weight: 600;
+  font-family: var(--font-body); color: var(--text-primary); background: transparent;
+  border: none; border-bottom: 1px solid var(--border-glass); outline: none;
+  transition: border-color var(--transition-fast);
+}
+.form-modal__title-input:focus { border-bottom-color: var(--accent-cyan); }
+.form-modal__title-input::placeholder { color: var(--text-muted); }
+.form-modal__row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+.form-modal__field { display: flex; flex-direction: column; gap: var(--space-2); }
+.form-modal__label {
+  font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.form-modal__toggle {
+  display: flex; border: 1px solid var(--border-glass); border-radius: var(--radius-md); overflow: hidden;
+}
+.form-modal__toggle-option {
+  flex: 1; padding: var(--space-3); font-size: 0.875rem; font-weight: 500;
+  color: var(--text-secondary); background: transparent; cursor: pointer;
+  transition: all var(--transition-fast); text-align: center;
+}
+.form-modal__toggle-option--active {
+  background: rgba(0,212,255,0.1); color: var(--accent-cyan);
+}
+.form-modal__tags-input {
+  display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-3) var(--space-4);
+  background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: var(--radius-md);
+  min-height: 44px; align-items: center; transition: border-color var(--transition-fast);
+}
+.form-modal__tags-input:focus-within { border-color: var(--accent-cyan); }
+.form-modal__tag {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px 2px 10px;
+  background: rgba(0,212,255,0.1); color: var(--accent-cyan);
+  border: 1px solid rgba(0,212,255,0.2); border-radius: 20px; font-size: 0.813rem;
+}
+.form-modal__tag button {
+  background: none; border: none; color: inherit; cursor: pointer; font-size: 1rem; line-height: 1;
+  padding: 0 2px; opacity: 0.6; transition: opacity var(--transition-fast);
+}
+.form-modal__tag button:hover { opacity: 1; }
+.form-modal__tag-field {
+  flex: 1; min-width: 100px; padding: 4px 0; font-size: 0.875rem;
+  background: transparent; border: none; outline: none; color: var(--text-primary);
+}
+.form-modal__tag-field::placeholder { color: var(--text-muted); }
+.form-modal__code {
+  width: 100%; min-height: 200px; padding: var(--space-4);
+  font-family: var(--font-code); font-size: 0.875rem; line-height: 1.6;
+  background: var(--bg-code); color: var(--text-primary);
+  border: 1px solid var(--border-glass); border-radius: var(--radius-md);
+  resize: vertical; tab-size: 2; transition: border-color var(--transition-fast);
+}
+.form-modal__code:focus { border-color: var(--accent-cyan); box-shadow: 0 0 0 3px rgba(0,212,255,0.1); }
+.form-modal__code::placeholder { color: var(--text-muted); }
+.form-modal__footer {
+  display: flex; justify-content: flex-end; gap: var(--space-3);
+  padding: var(--space-4) var(--space-6); border-top: 1px solid var(--border-glass);
+}
