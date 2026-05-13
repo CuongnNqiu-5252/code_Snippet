@@ -15,7 +15,7 @@ async def search(
     limit: int = Query(20, ge=1, le=100),
     user=Depends(get_current_user),
 ):
-    return await keyword_search(q, (user), language=language, limit=limit)
+    return keyword_search(q, (user), language=language, limit=limit)
 
 
 # Phase 2 placeholder — returns 501 until AI is wired up

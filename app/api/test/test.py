@@ -6,4 +6,4 @@ router = APIRouter(prefix="/test", tags=["test"])
 
 @router.get("/abc")
 async def create_abc():
-    return await create_embedding()
+    return await create_embedding("Hello word")

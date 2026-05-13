@@ -16,7 +16,7 @@ def _serialize(doc: dict) -> SnippetOut:
         id=str(doc["_id"]),
         title=doc["title"],
         code=doc["code"],
-        language=doc["language"],
+        programming_language=doc["programming_language"],
         tags=doc.get("tags", []),
         is_public=doc.get("isPublic", True),
         created_by=str(doc["createdBy"]),
@@ -41,7 +41,7 @@ async def create_snippet(
     doc = {
         "title": data.title,
         "code": data.code,
-        "language": data.language,
+        "programming_language": data.programming_language,
         "tags": data.tags,
         "isPublic": data.is_public,
         "createdBy": ObjectId(user_id),
@@ -52,7 +52,7 @@ async def create_snippet(
         "status": "pending",
     }
 
-    result = await db.snippets.insert_one(doc)
+    result = db.snippets.insert_one(doc)
     doc["_id"] = result.inserted_id
 
     # background task (future AI processing)
@@ -62,20 +62,21 @@ async def create_snippet(
 async def worker(snippet_id: str):
     db = get_db()
 
-    doc = await db.snippets.find_one({"_id": ObjectId(snippet_id)})
+    doc = db.snippets.find_one({"_id": ObjectId(snippet_id)})
+    print(doc)
     if not doc:
         return
     embedding_task = create_embedding(doc["code"])
     summary_task = generate_summary(doc["code"])
-
+    print("in progress...")
     embedding_res, summary = await asyncio.gather(
         embedding_task,
         summary_task
     )
-
+    print(summary_task)
     embedding_vector = embedding_res["data"][0]["embedding"]
 
-    await db.snippets.update_one(
+    db.snippets.update_one(
         {"_id": ObjectId(snippet_id)},
         {"$set": {"summary": summary, "embedding": embedding_vector ,"status": "done"}}
     )
@@ -114,7 +115,7 @@ def list_snippets(
 
 async def get_snippet(snippet_id: str, user_id: str) -> SnippetOut:
     db = get_db()
-    doc = await db.snippets.find_one({"_id": ObjectId(snippet_id)})
+    doc = db.snippets.find_one({"_id": ObjectId(snippet_id)})
     if not doc:
         raise HTTPException(status_code=404, detail="Snippet not found")
     if not doc["isPublic"] and str(doc["createdBy"]) != user_id:

@@ -10,7 +10,7 @@ class SnippetState(str, Enum):
 class SnippetCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     code: str = Field(..., min_length=1)
-    language: str = Field(..., min_length=1, max_length=50)
+    programming_language: str = Field(..., min_length=1, max_length=50)
     tags: List[str] = []
     is_public: bool = True
 
@@ -18,7 +18,7 @@ class SnippetCreate(BaseModel):
 class SnippetUpdate(BaseModel):
     title: Optional[str] = None
     code: Optional[str] = None
-    language: Optional[str] = None
+    programming_language: Optional[str] = None
     tags: Optional[List[str]] = None
     is_public: Optional[bool] = None
 
@@ -27,7 +27,7 @@ class SnippetOut(BaseModel):
     id: str
     title: str
     code: str
-    language: str
+    programming_language: str
     tags: List[str]
     is_public: bool
     created_by: str

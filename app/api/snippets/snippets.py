@@ -1,12 +1,16 @@
+import json
 from typing import List, Optional
 from fastapi import APIRouter, BackgroundTasks, Depends, Query, status
+from fastapi.sse import EventSourceResponse
 
+from app.core.database import get_db
+from app.core.queue import event_queue
 from app.core.security import get_current_user
 from app.models.snippet import SnippetCreate, SnippetOut, SnippetUpdate
 from app.service import snippet_service
 from typing import Annotated
 
-router = APIRouter(prefix="/snippets", tags=["snippets"],dependencies=[Depends(get_current_user)])
+router = APIRouter(prefix="/snippets", tags=["snippets"])
 
 
 @router.post("", response_model=SnippetOut, status_code=status.HTTP_201_CREATED)
@@ -27,8 +31,6 @@ def list_all(
     return snippet_service.list_snippets(
         user, language=language, tag=tag, skip=skip, limit=limit
     )
-
-
 @router.get("/{snippet_id}", response_model=SnippetOut)
 async def get_one(snippet_id: str, user=Depends(get_current_user)):
     return await snippet_service.get_snippet(snippet_id, user)
