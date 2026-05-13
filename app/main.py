@@ -67,7 +67,7 @@ items = [
 # async def sse_items() -> AsyncIterable[Item]:
 #     for item in items:
 #         yield item
-@app.get("/static", response_class=EventSourceResponse)
+@app.get("/event", response_class=EventSourceResponse)
 async def stream():
     print("🔌 SSE ENDPOINT HIT")
 

@@ -46,7 +46,7 @@ ACTION_MAP = [
 ]
 
 # Paths để bỏ qua (không cần log)
-SKIP_PATHS = {"/health", "/docs", "/openapi.json", "/redoc", "/favicon.ico"}
+SKIP_PATHS = {"/health", "/docs", "/openapi.json", "/redoc", "/favicon.ico","/event"}
 
 
 def _resolve_action(method: str, path: str) -> str:
