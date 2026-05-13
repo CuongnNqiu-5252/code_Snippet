@@ -76,6 +76,6 @@ async def stream():
         print("📦 EVENT RECEIVED:", event)
 
         yield {
-            "event": event["type"],
-            "data": event["data"]
+            "event": event["action"],
+            "data": event["status_code"]
         }
